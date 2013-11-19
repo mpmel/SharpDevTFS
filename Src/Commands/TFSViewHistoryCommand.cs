@@ -13,22 +13,20 @@ namespace SharpDevTFS
             {
 				
                 try {
-                    var historyList = item.Workspace.VersionControlServer.QueryHistory(item.ItemSpec).ToList();
-                    var earliest = historyList.OrderByDescending(x => x.CreationDate).FirstOrDefault();
-					
-					
-					
+                 //   var historyList = item.Workspace.VersionControlServer.QueryHistory(item.ItemSpec).ToList();
+                //    var earliest = historyList.OrderByDescending(x => x.CreationDate).FirstOrDefault();
+								
                     var wrapper = new TfsHistoryDialogWrapper(
                         item.Workspace.VersionControlServer, 
                         filename, 
                         VersionSpec.Latest, 
                         item.ItemSpec.DeletionId, 
-                        RecursionType.Full, 
-                        new DateVersionSpec(earliest.CreationDate),
-                        VersionSpec.Latest,
+                        RecursionType.OneLevel, 
+                        null,
+                        null,
                         string.Empty, 
                         int.MaxValue, 
-                        false);
+                        true);
                     wrapper.ShowDialog();
 					
                     //item.Workspace.VersionControlServer.GetItem(filename);

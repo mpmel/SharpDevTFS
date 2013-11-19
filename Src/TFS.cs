@@ -2,6 +2,7 @@
 // This code is distributed under the GNU LGPL (for details please see \doc\license.txt)
 
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -120,9 +121,9 @@ namespace SharpDevTFS
 	{	
 		static object getStatusLock = new object();
 		static object getWorkspaceLock = new object();
-		static Dictionary<string, TfsItem> tfsItemDict = new Dictionary<string, TfsItem>();
-		static Dictionary<string, Workspace> tfsWorkspaceCache = new Dictionary<string, Workspace>();
-		static Dictionary<Workspace, Dictionary<string, PendingChange>> pendingChangesCache = new Dictionary<Workspace, Dictionary<string, PendingChange>>(new GenericEqualityComparer<object>(ReferenceEquals, RuntimeHelpers.GetHashCode));
+        static ConcurrentDictionary<string, TfsItem> tfsItemDict = new ConcurrentDictionary<string, TfsItem>();
+        static ConcurrentDictionary<string, Workspace> tfsWorkspaceCache = new ConcurrentDictionary<string, Workspace>();
+        static ConcurrentDictionary<Workspace, Dictionary<string, PendingChange>> pendingChangesCache = new ConcurrentDictionary<Workspace, Dictionary<string, PendingChange>>(new GenericEqualityComparer<object>(ReferenceEquals, RuntimeHelpers.GetHashCode));
 		
 		public static Task UpdatePendingChanges(Workspace workspace)
 		{	
@@ -246,9 +247,9 @@ namespace SharpDevTFS
 				if (!tfsWorkspaceCache.TryGetValue(info.Name, out workspace))
 				{
 					workspace = info.GetWorkspace(new TfsTeamProjectCollection(info.ServerUri));
-					tfsWorkspaceCache.Add(info.Name, workspace);
+					tfsWorkspaceCache.TryAdd(info.Name, workspace);
 				    var changes = workspace.GetPendingChanges();
-				    pendingChangesCache.Add(workspace, changes.ToDictionary(x => x.LocalItem));	
+				    pendingChangesCache.TryAdd(workspace, changes.ToDictionary(x => x.LocalItem));	
 					workspace.VersionControlServer.PendingChangesChanged += PendingChangesModified;			    
 				}
 						
@@ -270,7 +271,7 @@ namespace SharpDevTFS
 			}
 			
 			tfsItem = new TfsItem(fileName);
-			tfsItemDict.Add(fileName, tfsItem);
+			tfsItemDict.TryAdd(fileName, tfsItem);
 			return tfsItem;
 		}
 
@@ -300,7 +301,7 @@ namespace SharpDevTFS
 	                return TFSStatus.Modified;
 
 	        }
-	        catch (Exception ex)
+	        catch (Exception)
 	        {
 	            return TFSStatus.None;
 	        }

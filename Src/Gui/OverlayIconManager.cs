@@ -107,48 +107,62 @@ namespace SharpDevTFS
 				}
 			}
 		}
-		
-		static void RunStep(AbstractProjectBrowserTreeNode node)
-		{
-			if (node.IsDisposed) return;
-			
-			var fileNode = node as FileNode;
-			TFSStatus status;
-			if (fileNode != null) {
-				status = TFS.GetFileStatus(fileNode.FileName);
-			} else {
-				
-				var projectNode = node as ProjectNode;
-				if (projectNode != null) {
-					status = TFS.GetFileStatus(projectNode.Project.FileName);
-				} else {				
-					var directoryNode = node as DirectoryNode;
-					if (directoryNode != null) {
-						status = TFS.GetFileStatus(directoryNode.Directory);
-					} else {
-						var solNode = node as SolutionNode;
-						if (solNode != null) {
-							status = TFS.GetFileStatus(solNode.Solution.Directory);
-						} else {
-							return;
-						}
-					}
-				}
-			}
-			
-			SD.MainThread.InvokeAsyncAndForget(delegate {
-				Image image = GetImage(status);
-				if (image != null) {
-					node.Overlay = image;
-				} else
-		if (node.Overlay != null && (node.Overlay.Tag as Type) == typeof(OverlayIconManager)) {
-					// reset overlay to null only if the old overlay belongs to the OverlayIconManager
-					node.Overlay = null;
-				}
-			});
-		}
-		
-		public static Image GetImage(TFSStatus status)
+
+	    private static void RunStep(AbstractProjectBrowserTreeNode node)
+	    {
+	        if (node.IsDisposed) return;
+
+	        var fileNode = node as FileNode;
+	        TFSStatus status;
+	        if (fileNode != null)
+	        {
+	            status = TFS.GetFileStatus(fileNode.FileName);
+	        }
+	        else
+	        {
+	            var projectNode = node as ProjectNode;
+	            if (projectNode != null)
+	            {
+	                status = TFS.GetFileStatus(projectNode.Project.FileName);
+	            }
+	            else
+	            {
+	                //var directoryNode = node as DirectoryNode;
+	                //if (directoryNode != null)
+	                //{
+	                //    status = TFS.GetFileStatus(directoryNode.Directory);
+	                //}
+	                //else
+	                //{
+	                var solNode = node as SolutionNode;
+	                if (solNode != null)
+	                {
+	                    status = TFS.GetFileStatus(solNode.Solution.Directory);
+	                }
+	                else
+	                {
+	                    return;
+	                }
+	                // }
+	            }
+	        }
+
+	        SD.MainThread.InvokeAsyncAndForget(delegate
+	        {
+	            Image image = GetImage(status);
+	            if (image != null)
+	            {
+	                node.Overlay = image;
+	            }
+	            else if (node.Overlay != null && (node.Overlay.Tag as Type) == typeof (OverlayIconManager))
+	            {
+	                // reset overlay to null only if the old overlay belongs to the OverlayIconManager
+	                node.Overlay = null;
+	            }
+	        });
+	    }
+
+	    public static Image GetImage(TFSStatus status)
 		{
 			switch (status) {
 				case TFSStatus.Added:

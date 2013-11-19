@@ -65,6 +65,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Configuration\AssemblyInfo.cs" />
+    <Compile Include="Src\Commands\TfsCompareCommand.cs" />
     <Compile Include="Src\Commands\TFSAddCommand.cs" />
     <Compile Include="Src\Commands\TFSCommand.cs" />
     <Compile Include="Src\Commands\TFSGetLatestCommand.cs" />
