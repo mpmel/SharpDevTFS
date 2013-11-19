@@ -1,0 +1,60 @@
+﻿<AddIn name        = "SharpDevTFS"
+       author      = "MikeM"
+       url         = ""
+       description = "SharpDevelop TFS integration" >
+	<Manifest>
+		<Identity name="SharpDevTFS" />
+	</Manifest>  
+	<Runtime>
+		<Import assembly = "SharpDevTFS.dll">
+		    <ConditionEvaluator name="IsUnderTFSControl" class="SharpDevTFS.IsUnderTFSControlCondition"/>
+	    	<ConditionEvaluator name="IsUnControlledInTFSWorkspace" class="SharpDevTFS.IsUnControlledInTFSWorkspaceCondition"/>
+        <ConditionEvaluator name="HasPendingChange" class="SharpDevTFS.HasPendingChangeCondition"/>
+		</Import>
+	</Runtime>
+	
+	<Path name = "/SharpDevelop/Autostart">
+		<Class id = "SharpDevTFS.RegisterEventsCommand"
+		       class = "SharpDevTFS.RegisterEventsCommand"/>
+	</Path>
+	
+	<Path name = "/SharpDevelop/Workbench/Tools">
+		<MenuItem id = "SharpDevTFSCommand1"
+		          label = "SharpDevTFS"
+		          class = "SharpDevTFS.ToolCommand1"/>
+	</Path>
+
+	<Path name="/Workspace/DocumentVersionProviders">
+		<Class id="TFS"
+		       class="SharpDevTFS.TFSVersionProvider" />
+	</Path>
+
+	<Path name = "/SharpDevelop/Pads/ProjectBrowser/ContextMenu/GitItem">
+		<Condition name = "IsUnControlledInTFSWorkspace">
+					<MenuItem id = "TFSAdd"
+			          label = "Add... (TFS)"
+			          icon  = "Svn.Commit"
+			          class = "SharpDevTFS.TFSAddCommand"/>
+		</Condition>
+    <Condition name = "HasPendingChange">
+      <MenuItem id = "TFSUndo"
+			          label = "Undo... (TFS)"
+			          icon  = "Svn.Commit"
+			          class = "SharpDevTFS.TFSUndoCommand"/>
+    </Condition>
+    
+		<Condition name = "IsUnderTFSControl">
+			<MenuItem id = "TFSeparator" type = "Separator"/>
+			
+			<MenuItem id = "TFSGetLatest"
+			          label = "Get Latest ... (TFS)"
+			          icon  = "Svn.Commit"
+			          class = "SharpDevTFS.TFSGetLatestCommand"/>
+			<!--<MenuItem id = "TFSViewHistory"
+			          label = "View History ... (TFS)"
+			          icon  = "Svn.Commit"
+			          class = "SharpDevTFS.TFSViewHistoryCommand"/>-->
+		</Condition>
+	</Path>
+	
+</AddIn>
