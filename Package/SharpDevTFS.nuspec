@@ -2,11 +2,11 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata>
     <id>SharpDevTFS</id>
-    <version>0.0.1.0</version>
+    <version>0.0.2.0</version>
     <authors>Mike Melancon</authors>
     <owners>Mike Melancon</owners>
-    <projectUrl>http://www.icsharpcode.net/OpenSource/SD/</projectUrl>
-    <description>TFS Addin</description>
+    <projectUrl>http://sharpdevtfs.codeplex.com</projectUrl>
+    <description>TFS integration for SharpDevelop</description>
     <tags>SharpDevelop TFS</tags>
   </metadata>
   <files>

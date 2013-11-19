@@ -40,7 +40,11 @@
       <MenuItem id = "TFSUndo"
 			          label = "Undo Pending Changes... "
 			          icon  = "Svn.Commit"
-			          class = "SharpDevTFS.TFSUndoCommand"/>
+			          class = "SharpDevTFS.TFSUndoCommand"/>  
+      <MenuItem id = "TFSCompare"
+			          label = "Compare... "
+			          icon  = "Svn.Commit"
+			          class = "SharpDevTFS.TfsCompareCommand"/>
     </Condition>
     
 		<Condition name = "IsUnderTFSControl">
@@ -50,10 +54,10 @@
 			          label = "Get Latest (Recursive)"
 			          icon  = "Svn.Commit"
 			          class = "SharpDevTFS.TFSGetLatestCommand"/>
-			<!--<MenuItem id = "TFSViewHistory"
+			<MenuItem id = "TFSViewHistory"
 			          label = "View History ... (TFS)"
 			          icon  = "Svn.Commit"
-			          class = "SharpDevTFS.TFSViewHistoryCommand"/>-->
+			          class = "SharpDevTFS.TFSViewHistoryCommand"/>
 		</Condition>
 	</Path>
 	
