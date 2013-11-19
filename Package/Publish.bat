@@ -1,0 +1,1 @@
+nuget push AWeizel.SharpDevTFS.0.0.1.0.nupkg  -s https://www.myget.org/F/sharpdevelop/

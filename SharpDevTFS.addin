@@ -26,19 +26,19 @@
 
 	<Path name="/Workspace/DocumentVersionProviders">
 		<Class id="TFS"
-		       class="SharpDevTFS.TFSVersionProvider" />
+		       class="SharpDevTFS.TfsVersionProvider" />
 	</Path>
 
 	<Path name = "/SharpDevelop/Pads/ProjectBrowser/ContextMenu/GitItem">
 		<Condition name = "IsUnControlledInTFSWorkspace">
 					<MenuItem id = "TFSAdd"
-			          label = "Add... (TFS)"
+			          label = "Add To Source Control... (TFS)"
 			          icon  = "Svn.Commit"
 			          class = "SharpDevTFS.TFSAddCommand"/>
 		</Condition>
     <Condition name = "HasPendingChange">
       <MenuItem id = "TFSUndo"
-			          label = "Undo... (TFS)"
+			          label = "Undo Pending Changes... "
 			          icon  = "Svn.Commit"
 			          class = "SharpDevTFS.TFSUndoCommand"/>
     </Condition>
@@ -47,7 +47,7 @@
 			<MenuItem id = "TFSeparator" type = "Separator"/>
 			
 			<MenuItem id = "TFSGetLatest"
-			          label = "Get Latest ... (TFS)"
+			          label = "Get Latest (Recursive)"
 			          icon  = "Svn.Commit"
 			          class = "SharpDevTFS.TFSGetLatestCommand"/>
 			<!--<MenuItem id = "TFSViewHistory"

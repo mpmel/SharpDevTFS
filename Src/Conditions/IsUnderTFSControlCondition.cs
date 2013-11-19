@@ -11,15 +11,19 @@ namespace SharpDevTFS
 		{		
 			var node = ProjectBrowserPad.Instance.SelectedNode as FileNode;
 			if (node != null) 
-				return TFS.IsUnderTFSControl(node.FileName);		
+				return TFS.IsUnderTfsControl(node.FileName);
+
+            var proj = ProjectBrowserPad.Instance.SelectedNode as ProjectNode;
+            if (proj != null)
+                return TFS.IsUnderTfsControl(proj.Project.FileName);	
 			
 			var dir = ProjectBrowserPad.Instance.SelectedNode as DirectoryNode;
 			if (dir != null) 
-				return TFS.IsUnderTFSControl(dir.Directory);	
+				return TFS.IsUnderTfsControl(dir.Directory);	
 			
 			var sol = ProjectBrowserPad.Instance.SelectedNode as SolutionNode;
 			if (sol != null) 
-				return TFS.IsUnderTFSControl(sol.Solution.Directory);
+				return TFS.IsUnderTfsControl(sol.Solution.Directory);
 			
 			return false;
 		}
@@ -32,6 +36,10 @@ namespace SharpDevTFS
             var node = ProjectBrowserPad.Instance.SelectedNode as FileNode;
             if (node != null)
                 return TFS.GetPendingChange(node.FileName) != null;
+
+            var proj = ProjectBrowserPad.Instance.SelectedNode as ProjectNode;
+            if (proj != null)
+                return TFS.GetPendingChange(proj.Project.FileName) != null;	
 
             var dir = ProjectBrowserPad.Instance.SelectedNode as DirectoryNode;
             if (dir != null)
@@ -51,15 +59,20 @@ namespace SharpDevTFS
 		{		
 			var node = ProjectBrowserPad.Instance.SelectedNode as FileNode;
 			if (node != null) 
-				return TFS.IsUnControlledInTFSWorkspace(node.FileName);		
+				return TFS.IsUnControlledInTfsWorkspace(node.FileName);
+
+            var proj = ProjectBrowserPad.Instance.SelectedNode as ProjectNode;
+            if (proj != null)
+                return TFS.IsUnControlledInTfsWorkspace(proj.Project.FileName);	
+
 			
 			var dir = ProjectBrowserPad.Instance.SelectedNode as DirectoryNode;
 			if (dir != null) 
-				return TFS.IsUnControlledInTFSWorkspace(dir.Directory);	
+				return TFS.IsUnControlledInTfsWorkspace(dir.Directory);	
 			
 			var sol = ProjectBrowserPad.Instance.SelectedNode as SolutionNode;
 			if (sol != null) 
-				return TFS.IsUnControlledInTFSWorkspace(sol.Solution.Directory);
+				return TFS.IsUnControlledInTfsWorkspace(sol.Solution.Directory);
 			
 			return false;
 		}

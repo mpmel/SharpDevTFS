@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>SharpDevTFS</id>
+    <version>0.0.1.0</version>
+    <authors>Mike Melancon</authors>
+    <owners>Mike Melancon</owners>
+    <projectUrl>http://www.icsharpcode.net/OpenSource/SD/</projectUrl>
+    <description>TFS Addin</description>
+    <tags>SharpDevelop TFS</tags>
+  </metadata>
+  <files>
+    <file src="..\bin\Debug\SharpDevTFS.addin" target="" />
+    <file src="..\bin\Debug\SharpDevTFS.dll" target="" />
+  </files>
+</package>
