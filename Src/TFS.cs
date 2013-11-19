@@ -30,50 +30,37 @@ namespace SharpDevTFS
 		Ignored
 	}
 	
-	public class TFSItem
+	public class TfsItem
 	{
-		public TFSItem(string path)
+		public TfsItem(string path)
 		{
-			Stopwatch sw = new Stopwatch();
-			try 
-			{
-				sw.Start();
-			Path = path;
-			
-			
+			Path = path;					
 			var info = Workstation.Current.GetLocalWorkspaceInfo(path);
 			if ( info != null)		
 			{
 				Workspace = TFS.GetWorkspace(info);
 				PendingChange = Workspace.GetPendingChange(path);
 			}
+
 			WorkspaceInfo = info;
-
-			//UpdateInfo();
-			sw.Stop();
-			} 
-			finally 
-			{
-				SD.Log.DebugFormatted("TFS Item: {0}, Elapsed time: {1}", path, sw.Elapsed.TotalMilliseconds);
-			}
-
 		}
 		
 		public string Path { get; set; }
-		///public ExtendedItem ExtendedItem { get; set; }
-		public ItemSpec ItemSpec { get {
-			    return ItemSpec.FromStrings(new[] { Path }, RecursionType.None)[0];
-			}
-			
-		}
-		public Workspace Workspace { get; set; }
+
+	    public ItemSpec ItemSpec
+	    {
+	        get { return ItemSpec.FromStrings(new[] {Path}, RecursionType.None)[0]; }
+
+	    }
+
+	    public Workspace Workspace { get; set; }
 		public WorkspaceInfo WorkspaceInfo{ get; set; }
 		
 		PendingChange PendingChange { get; set; }
 		
 		public ChangeType? GetChangeType()
 		{
-			PendingChange pendingChange = TFS.GetPendingChange(Workspace, Path);
+			PendingChange pendingChange = Workspace.GetPendingChange(Path);
 			PendingChange = pendingChange;
 			if (PendingChange != null)
 			{
@@ -82,16 +69,11 @@ namespace SharpDevTFS
 			
 			if (Workspace.VersionControlServer.ServerItemExists(Path, Microsoft.TeamFoundation.VersionControl.Client.ItemType.Any))
 				return ChangeType.None;
-			else
-				return null;
-			    
+		    return null;
 		}
-		
-		
 		
 		public ExtendedItem GetExtendedItem()
 		{
-			var pending = Workspace.GetPendingChanges();
 			if (Workspace == null)
 				return null;
 			
@@ -138,7 +120,7 @@ namespace SharpDevTFS
 	{	
 		static object getStatusLock = new object();
 		static object getWorkspaceLock = new object();
-		static Dictionary<string, TFSItem> tfsItemDict = new Dictionary<string, TFSItem>();
+		static Dictionary<string, TfsItem> tfsItemDict = new Dictionary<string, TfsItem>();
 		static Dictionary<string, Workspace> tfsWorkspaceCache = new Dictionary<string, Workspace>();
 		static Dictionary<Workspace, Dictionary<string, PendingChange>> pendingChangesCache = new Dictionary<Workspace, Dictionary<string, PendingChange>>(new GenericEqualityComparer<object>(ReferenceEquals, RuntimeHelpers.GetHashCode));
 		
@@ -158,31 +140,31 @@ namespace SharpDevTFS
 
         public static void AddFile(string fileName)
         {
-            var item = TFS.GetTFSItem(fileName);
+            var item = GetTfsItem(fileName);
             if (item != null)
                 if (item.Workspace.PendAdd(fileName) > 0)            
-                    TFS.UpdateStatusCacheAndEnqueueFile(fileName);
+                    UpdateStatusCacheAndEnqueueFile(fileName);
         }
 
         public static void UndoFile(string fileName)
         {
-            var item = TFS.GetTFSItem(fileName);
+            var item = GetTfsItem(fileName);
             if (item != null)
             {
                 int changes = item.Workspace.Undo(fileName);
                 var status = item.Workspace.Get(new[] { fileName }, VersionSpec.Latest, RecursionType.None, GetOptions.Overwrite);
                 TFSMessageView.Log("TFS: {0} changes undone", changes);
                 if (changes > 0)
-                    TFS.UpdateStatusCacheAndEnqueueFile(fileName);
+                    UpdateStatusCacheAndEnqueueFile(fileName);
             }
             
         }
 
         public static async void UpdateStatusCacheAndEnqueueFile(string fileName)
         {
-            var item = GetTFSItem(fileName);
+            var item = GetTfsItem(fileName);
             if (item != null)
-              await TFS.UpdatePendingChanges(item.Workspace);
+              await UpdatePendingChanges(item.Workspace);
             ProjectBrowserPad pad = ProjectBrowserPad.Instance;
             if (pad == null) return;
             FileNode node = pad.ProjectBrowserControl.FindFileNode(fileName);
@@ -190,28 +172,28 @@ namespace SharpDevTFS
             OverlayIconManager.EnqueueParents(node);
         }
 
-		public static bool IsUnderTFSControl(string fileName)
+		public static bool IsUnderTfsControl(string fileName)
 		{
 			if (string.IsNullOrWhiteSpace(fileName))
 				return false;
-			var item = TFS.GetTFSItem(fileName);
+			var item = GetTfsItem(fileName);
 			if (item.Workspace == null)
 				return false;
 			return item.Workspace.VersionControlServer.ServerItemExists(item.Path, Microsoft.TeamFoundation.VersionControl.Client.ItemType.Any);
 		}
 		
-		public static bool IsUnControlledInTFSWorkspace(string fileName)
+		public static bool IsUnControlledInTfsWorkspace(string fileName)
 		{
 			if (string.IsNullOrWhiteSpace(fileName))
 				return false;
-			var item = TFS.GetTFSItem(fileName);
+			var item = GetTfsItem(fileName);
 			if (item.Workspace == null)
 				return false;
 
             return !item.Workspace.VersionControlServer.ServerItemExists(item.Path, Microsoft.TeamFoundation.VersionControl.Client.ItemType.Any) && (TFS.GetFileStatus(fileName) == TFSStatus.None);
 		}
 
-        public static PendingChange GetPendingChange(this TFSItem item)
+        public static PendingChange GetPendingChange(this TfsItem item)
         {
             if (item == null)
                 return null;
@@ -223,14 +205,13 @@ namespace SharpDevTFS
                 changeDict.TryGetValue(item.Path, out pendingChange);
                 return pendingChange;
             }
-            else
-                return null;
-
+            
+            return null;
         }
 
         public static PendingChange GetPendingChange(string path)
         {
-            var item = GetTFSItem(path);
+            var item = GetTfsItem(path);
             if (item == null)
                 return null;
 
@@ -241,9 +222,8 @@ namespace SharpDevTFS
                 changeDict.TryGetValue(item.Path, out pendingChange);
                 return pendingChange;
             }
-            else
-                return null;
-
+            
+            return null;
         }
 		
 		public static PendingChange GetPendingChange(this Workspace workspace, string path)
@@ -255,9 +235,8 @@ namespace SharpDevTFS
 				changeDict.TryGetValue(path, out pendingChange);
 				return pendingChange;			
 			}
-			else
-				return null;
-			
+		    
+            return null;
 		}
 		
 		public static Workspace GetWorkspace(WorkspaceInfo info)
@@ -266,7 +245,7 @@ namespace SharpDevTFS
 				Workspace workspace;
 				if (!tfsWorkspaceCache.TryGetValue(info.Name, out workspace))
 				{
-					workspace = info.GetWorkspace(new TeamFoundationServer(info.ServerUri));
+					workspace = info.GetWorkspace(new TfsTeamProjectCollection(info.ServerUri));
 					tfsWorkspaceCache.Add(info.Name, workspace);
 				    var changes = workspace.GetPendingChanges();
 				    pendingChangesCache.Add(workspace, changes.ToDictionary(x => x.LocalItem));	
@@ -282,54 +261,54 @@ namespace SharpDevTFS
 			
 		}
 		
-		public static TFSItem GetTFSItem(string fileName)
+		public static TfsItem GetTfsItem(string fileName)
 		{
-			TFSItem tfsItem;
+			TfsItem tfsItem;
 			if(tfsItemDict.TryGetValue(fileName, out tfsItem))
 			{
 				return tfsItem;
 			}
 			
-			tfsItem = new TFSItem(fileName);
+			tfsItem = new TfsItem(fileName);
 			tfsItemDict.Add(fileName, tfsItem);
 			return tfsItem;
 		}
-		
-		public static TFSStatus GetFileStatus(string fileName)
-		{
-			if (string.IsNullOrWhiteSpace(fileName))
-				return TFSStatus.None;
-			    
-			TFSItem tfsItem = GetTFSItem(fileName);
-			
-			if (tfsItem.WorkspaceInfo == null)
-				return TFSStatus.None;
 
-		try
-		{					
-			var change = tfsItem.GetChangeType();
-			if (change == null)
-				return TFSStatus.None;
-			
-			if (change.Value == ChangeType.None)
-				return TFSStatus.OK;
-			
-			if ((change.Value & ChangeType.Add) == ChangeType.Add)
-				return TFSStatus.Added;
-			
-			if ((change.Value & ChangeType.Edit) == ChangeType.Edit)
-				return TFSStatus.Modified;
-			
-		}
-		catch(Exception ex)
-		{
-			return TFSStatus.None;
-		}
-	
-		return TFSStatus.None;
-			
-		}
-			
+	    public static TFSStatus GetFileStatus(string fileName)
+	    {
+	        if (string.IsNullOrWhiteSpace(fileName))
+	            return TFSStatus.None;
+
+	        var tfsItem = GetTfsItem(fileName);
+
+	        if (tfsItem.WorkspaceInfo == null)
+	            return TFSStatus.None;
+
+	        try
+	        {
+	            var change = tfsItem.GetChangeType();
+	            if (change == null)
+	                return TFSStatus.None;
+
+	            if (change.Value == ChangeType.None)
+	                return TFSStatus.OK;
+
+	            if ((change.Value & ChangeType.Add) == ChangeType.Add)
+	                return TFSStatus.Added;
+
+	            if ((change.Value & ChangeType.Edit) == ChangeType.Edit)
+	                return TFSStatus.Modified;
+
+	        }
+	        catch (Exception ex)
+	        {
+	            return TFSStatus.None;
+	        }
+
+	        return TFSStatus.None;
+
+	    }
+
 	}
 	
 }

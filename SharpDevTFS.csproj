@@ -65,14 +65,18 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Configuration\AssemblyInfo.cs" />
+    <Compile Include="Src\Commands\TFSAddCommand.cs" />
     <Compile Include="Src\Commands\TFSCommand.cs" />
+    <Compile Include="Src\Commands\TFSGetLatestCommand.cs" />
+    <Compile Include="Src\Gui\TfsHistoryDialogWrapper.cs" />
     <Compile Include="Src\Commands\TFSUndoCommand.cs" />
+    <Compile Include="Src\Commands\TFSViewHistoryCommand.cs" />
     <Compile Include="Src\Conditions\IsUnderTFSControlCondition.cs" />
     <Compile Include="Src\Gui\OverlayIconManager.cs" />
     <Compile Include="Src\RegisterEventsCommand.cs" />
     <Compile Include="Src\Gui\TFSMessageView.cs" />
     <Compile Include="Src\TFS.cs" />
-    <Compile Include="Src\TFSVersionProvider.cs" />
+    <Compile Include="Src\TfsVersionProvider.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Code\SharpDevelop\src\Libraries\AvalonEdit\ICSharpCode.AvalonEdit\ICSharpCode.AvalonEdit.csproj">

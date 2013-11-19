@@ -51,7 +51,7 @@ namespace SharpDevTFS
 	
 		async void RemoveFile(string fileName)
 		{
-			var item = TFS.GetTFSItem(fileName);
+			var item = TFS.GetTfsItem(fileName);
 			if (item != null)
 			{
 				if (item.Workspace.PendDelete(fileName) > 0)
@@ -65,7 +65,7 @@ namespace SharpDevTFS
 		
 		async void RenameFile(string sourceFileName, string targetFileName)
 		{
-			var item = TFS.GetTFSItem(sourceFileName);
+			var item = TFS.GetTfsItem(sourceFileName);
 			if (item != null)
 			{
 				if (item.Workspace.PendRename(sourceFileName, targetFileName, LockLevel.Unchanged, false, false) > 0)

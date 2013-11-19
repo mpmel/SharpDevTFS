@@ -8,8 +8,6 @@
  */
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
 using System.Text;
 
 using ICSharpCode.AvalonEdit.Highlighting;
@@ -19,7 +17,6 @@ using ICSharpCode.SharpDevelop.Editor;
 using ICSharpCode.SharpDevelop.Gui;
 using ICSharpCode.SharpDevelop.Project;
 using ICSharpCode.SharpDevelop.Workbench;
-using Microsoft.TeamFoundation.VersionControl.Client;
 
 namespace SharpDevTFS
 {
@@ -59,7 +56,7 @@ namespace SharpDevTFS
 			textArea.Refresh();*/
 		}
 	}
-	
+
 	
 	public abstract class TFSCommand : SimpleCommand
 	{
@@ -70,14 +67,28 @@ namespace SharpDevTFS
 			AbstractProjectBrowserTreeNode node = ProjectBrowserPad.Instance.SelectedNode;
 			if (node != null) {
 				string nodeFileName = null;
-				if (node is DirectoryNode) {
-					nodeFileName = ((DirectoryNode)node).Directory;
-				} else if (node is FileNode) {
-					nodeFileName =  ((FileNode)node).FileName;
-				} else if (node is SolutionNode) {
-					nodeFileName = ((SolutionNode)node).Solution.Directory;
-				}
-				if (nodeFileName != null) {
+			    var projectNode = node as ProjectNode;
+			    if (projectNode != null)
+			        nodeFileName = projectNode.Project.FileName;
+			    else
+			    {
+			        var directoryNode = node as DirectoryNode;
+			        if (directoryNode != null)
+			            nodeFileName = directoryNode.Directory;
+			        else
+			        {
+			            var fileNode = node as FileNode;
+			            if (fileNode != null)
+			                nodeFileName = fileNode.FileName;
+			            else
+			            {
+			                var solutionNode = node as SolutionNode;
+			                if (solutionNode != null)
+			                    nodeFileName = solutionNode.Solution.Directory;
+			            }
+			        }
+			    }
+			    if (nodeFileName != null) {
 					List<OpenedFile> unsavedFiles = new List<OpenedFile>();
 					foreach (OpenedFile file in SD.FileService.OpenedFiles) {
 						if (file.IsDirty && !file.IsUntitled) {
@@ -123,109 +134,4 @@ namespace SharpDevTFS
 			};
 		}
 	}
-    
-    public class TFSGetLatestCommand : TFSCommand
-	{
-		protected override void Execute(string filename, Action callback)
-		{
-			var item = TFS.GetTFSItem(filename);
-			if(item != null)
-			{
-				try {
-							
-					 GetRequest request = new GetRequest(item.ItemSpec, VersionSpec.Latest);
-                     GetStatus status = item.Workspace.Get(request, GetOptions.None); // this line doesn't do anything - no failures or errors
-                     if (status.NoActionNeeded)
-                         TFSMessageView.Log("All files are up to date.");
-                     else
-                         TFSMessageView.Log(filename + " updated.");
-					
-				} 
-				catch (Exception ex)
-				{
-					
-				
-				}
-				
-			}
-		}
-	}
-    
-    public class TFSViewHistoryCommand : TFSCommand
-	{
-		protected override void Execute(string filename, Action callback)
-		{
-			var item = TFS.GetTFSItem(filename);
-			if(item != null)
-			{
-				
-				try {
-					var historyList = item.Workspace.VersionControlServer.QueryHistory(item.ItemSpec).ToList();
-					var earliest = historyList.OrderByDescending(x => x.CreationDate).FirstOrDefault();
-					
-					
-					
-					var wrapper = new TfsHistoryDialogWrapper(
-						item.Workspace.VersionControlServer, 
-						filename, 
-						VersionSpec.Latest, 
-						item.ItemSpec.DeletionId, 
-						RecursionType.Full, 
-						new DateVersionSpec(earliest.CreationDate),
-						VersionSpec.Latest,
-						string.Empty, 
-						int.MaxValue, 
-						false);
-					wrapper.ShowDialog();
-					
-					//item.Workspace.VersionControlServer.GetItem(filename);
-				} 
-				catch (Exception ex)
-				{
-					
-				
-				}
-				
-			}
-		}
-	}
-    
-    public class TFSAddCommand : TFSCommand
-	{
-		protected override void Execute(string filename, Action callback)
-		{
-				try {
-                    TFS.AddFile(filename);
-				} 
-				catch (Exception ex)
-				{
-                    TFSMessageView.Log("TFSError: Add: " + ex.Message + " (" + filename + ")");
-				}				
-		}
-	}
-        
-public class TfsHistoryDialogWrapper
-{
-    private readonly Type _dialogHistoryType;
-    private readonly object _historyDialogInstance;
-
-    public TfsHistoryDialogWrapper(VersionControlServer versionControl, string historyItem, VersionSpec itemVersion, int itemDeletionId, RecursionType recursionType, VersionSpec versionFrom, VersionSpec versionTo, string userFilter, int maxVersions, bool? slotMode)
-    {
-        Assembly tfsAssembly = typeof(Microsoft.TeamFoundation.VersionControl.Controls.LocalPathLinkBox).Assembly;
-        _dialogHistoryType = tfsAssembly.GetType("Microsoft.TeamFoundation.VersionControl.Controls.DialogHistory");
-
-        _historyDialogInstance = _dialogHistoryType.GetConstructor(
-                                BindingFlags.NonPublic | BindingFlags.Instance,
-                                null, 
-                                new Type[]{typeof(VersionControlServer), typeof(string), typeof(VersionSpec), typeof(int), typeof(RecursionType), typeof(VersionSpec), typeof(VersionSpec), typeof(string), typeof(int), typeof(bool?)},
-                                null).Invoke(new object[]{ versionControl, historyItem, itemVersion, itemDeletionId, recursionType, versionFrom, versionTo, userFilter, maxVersions, slotMode });
-    }
-
-    public void ShowDialog()
-    {
-        _dialogHistoryType.GetMethod("ShowDialog", new Type[]{}).Invoke(_historyDialogInstance, new object[]{});
-    }
-
-}
-	
 }
