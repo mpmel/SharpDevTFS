@@ -60,7 +60,7 @@ namespace SharpDevTFS
 	
 	public abstract class TFSCommand : SimpleCommand
 	{
-		protected abstract void Execute(string filename, Action callback);
+		protected abstract void Execute(string filename, AbstractProjectBrowserTreeNode node, Action callback);
 		
 		public override void Execute(object parameter)
 		{
@@ -118,7 +118,7 @@ namespace SharpDevTFS
 						}
 					}
 					// now run the actual operation:
-					Execute(nodeFileName, AfterCommand(nodeFileName, node));
+					Execute(nodeFileName, node, AfterCommand(nodeFileName, node));
 				}
 			}
 		}

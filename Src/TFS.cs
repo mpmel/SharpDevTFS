@@ -137,9 +137,31 @@ namespace SharpDevTFS
 				}
 			});		
 		}
-	
 
-        public static void AddFile(string fileName)
+	    public static string GetFileName(AbstractProjectBrowserTreeNode node)
+	    {
+	        if (node == null) return string.Empty;
+
+	        var projectNode = node as ProjectNode;
+	        if (projectNode != null)
+	            return projectNode.Project.FileName;
+
+	        var directoryNode = node as DirectoryNode;
+	        if (directoryNode != null)
+	            return directoryNode.Directory;
+
+	        var fileNode = node as FileNode;
+	        if (fileNode != null)
+	            return fileNode.FileName;
+
+	        var solutionNode = node as SolutionNode;
+	        if (solutionNode != null)
+	            return solutionNode.Solution.Directory;
+
+	        return string.Empty;
+	    }
+
+	    public static void AddFile(string fileName)
         {
             var item = GetTfsItem(fileName);
             if (item != null)
@@ -196,7 +218,7 @@ namespace SharpDevTFS
 
         public static PendingChange GetPendingChange(this TfsItem item)
         {
-            if (item == null)
+            if (item == null || item.Workspace == null)
                 return null;
 
             Dictionary<string, PendingChange> changeDict;
@@ -213,7 +235,7 @@ namespace SharpDevTFS
         public static PendingChange GetPendingChange(string path)
         {
             var item = GetTfsItem(path);
-            if (item == null)
+            if (item == null || item.Workspace == null)
                 return null;
 
             Dictionary<string, PendingChange> changeDict;
@@ -229,6 +251,8 @@ namespace SharpDevTFS
 		
 		public static PendingChange GetPendingChange(this Workspace workspace, string path)
 		{
+			if (workspace == null)
+				return null;
 			Dictionary<string, PendingChange> changeDict;
 			if (pendingChangesCache.TryGetValue(workspace, out changeDict))
 			{

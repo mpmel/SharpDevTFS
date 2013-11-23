@@ -5,13 +5,14 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using ICSharpCode.SharpDevelop.Project;
 using Microsoft.TeamFoundation.VersionControl.Client;
 
 namespace SharpDevTFS
 {
     public class TfsCompareCommand : TFSCommand
     {
-        protected override void Execute(string filename, Action callback)
+        protected override void Execute(string filename, AbstractProjectBrowserTreeNode node, Action callback)
         {
             try
             {
