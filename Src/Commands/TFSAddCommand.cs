@@ -1,10 +1,11 @@
 ﻿using System;
+using ICSharpCode.SharpDevelop.Project;
 
 namespace SharpDevTFS
 {
     public class TFSAddCommand : TFSCommand
     {
-        protected override void Execute(string filename, Action callback)
+        protected override void Execute(string filename, AbstractProjectBrowserTreeNode node, Action callback)
         {
             try {
                 TFS.AddFile(filename);

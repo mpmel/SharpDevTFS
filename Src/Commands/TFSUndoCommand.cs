@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ICSharpCode.SharpDevelop.Project;
 
 namespace SharpDevTFS
 {
     public class TFSUndoCommand : TFSCommand
     {
-        protected override void Execute(string filename, Action callback)
+        protected override void Execute(string filename, AbstractProjectBrowserTreeNode node, Action callback)
         {
             try
             {

@@ -18,11 +18,11 @@
 		       class = "SharpDevTFS.RegisterEventsCommand"/>
 	</Path>
 	
-	<Path name = "/SharpDevelop/Workbench/Tools">
+	<!--<Path name = "/SharpDevelop/Workbench/Tools">
 		<MenuItem id = "SharpDevTFSCommand1"
 		          label = "SharpDevTFS"
 		          class = "SharpDevTFS.ToolCommand1"/>
-	</Path>
+	</Path>-->
 
 	<Path name="/Workspace/DocumentVersionProviders">
 		<Class id="TFS"

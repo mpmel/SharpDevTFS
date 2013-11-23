@@ -1,12 +1,13 @@
 using System;
 using System.Linq;
+using ICSharpCode.SharpDevelop.Project;
 using Microsoft.TeamFoundation.VersionControl.Client;
 
 namespace SharpDevTFS
 {
     public class TFSViewHistoryCommand : TFSCommand
     {
-        protected override void Execute(string filename, Action callback)
+        protected override void Execute(string filename, AbstractProjectBrowserTreeNode node, Action callback)
         {
             var item = TFS.GetTfsItem(filename);
             if(item != null)
